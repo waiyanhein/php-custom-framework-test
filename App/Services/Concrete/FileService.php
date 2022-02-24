@@ -126,7 +126,6 @@ class FileService implements IFileService
     public function search(?string $keyword): array
     {
         $result = [];
-        // TODO: use parameterised query to prevent SQL injection
         $sql = "SELECT * FROM files";
         $parameters = [];
         if (! empty($keyword)) {

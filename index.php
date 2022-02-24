@@ -1,11 +1,13 @@
 <?php
 
 require 'autoload.php';
+
 $container = new Container();
 $container->bindServices();
 $databaseService = $container->get(IDatabaseService::class);
 $databaseService->connect();
 
+echo "all good";
 //$fileService = $container->get(IFileService::class);
 //// $fileService->importFiles();
 ////

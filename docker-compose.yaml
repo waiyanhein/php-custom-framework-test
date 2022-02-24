@@ -1,16 +1,20 @@
 version: '3'
 services:
   web:
-    container_name: php-apache
-    image: php:8.0-apache
+    container_name: web
+    build:
+      context: ./
+      dockerfile: Dockerfile
     volumes:
       - ./:/var/www/html/
     networks:
       - test-network
     depends_on:
       - db
+    links:
+      - db
     ports:
-      - "8000:80"
+      - "80:80"
       - "443:443"
   php-fpm:
     container_name: test_php
@@ -22,6 +26,7 @@ services:
   db:
     container_name: test_db
     image: mariadb:10.2
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: test
       MYSQL_DATABASE: test
