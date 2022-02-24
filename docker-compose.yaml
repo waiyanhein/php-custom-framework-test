@@ -1,0 +1,41 @@
+version: '3'
+services:
+  web:
+    container_name: php-apache
+    image: php:8.0-apache
+    volumes:
+      - ./:/var/www/html/
+    networks:
+      - test-network
+    depends_on:
+      - db
+    ports:
+      - "8000:80"
+      - "443:443"
+  php-fpm:
+    container_name: test_php
+    image: jguyomard/laravel-php:7.3
+    volumes:
+      - ./:/var/www/
+    networks:
+      - test-network
+  db:
+    container_name: test_db
+    image: mariadb:10.2
+    environment:
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: test
+      MYSQL_USER: test
+      MYSQL_PASSWORD: secret
+    volumes:
+      - test-data:/var/lib/mysql
+    networks:
+      - test-network
+    ports:
+      - "33060:3306"
+networks:
+  test-network:
+    driver: "bridge"
+volumes:
+  test-data:
+    driver: "local"
