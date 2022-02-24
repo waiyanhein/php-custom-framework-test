@@ -127,4 +127,89 @@ class FileServiceTest extends BaseTest
 
         $this->assertEqual(18, count($rows));
     }
+
+    public function test_it_get_all_files_func_retrieves_all_files_from_database()
+    {
+        $this->fileService->importFiles();// just called this function to seed data for the time-being
+        $result = $this->fileService->getAllFiles();
+        $this->assertEqual(18, count($result));
+        foreach ($result as $index => $file) {
+            $expectedId = $index + 1;
+            $this->assertEqual($expectedId, $file->getId());
+        }
+    }
+
+    public function test_get_full_path_func_returns_full_path_recursively_looking_up_parent_directories()
+    {
+        $this->fileService->importFiles();// just called this function to seed data for the time-being
+        $file = new File(18, "Mysql.com", 16);
+        $result = $this->fileService->getFullPath($file);
+
+        $this->assertEqual('C:\\\Program Files\Mysql\Mysql.com', $result);
+    }
+
+    public function test_get_full_path_func_returns_initial_file_path_when_initial_file_does_not_have_parent_directory()
+    {
+        $this->fileService->importFiles();// just called this function to seed data for the time-being
+        $file = new File(1, "C:\\", 0);
+        $result = $this->fileService->getFullPath($file);
+
+        $this->assertEqual('C:\\', $result);
+    }
+
+    public function test_search_returns_full_paths_of_files_that_match_to_keyword()
+    {
+        $expectedResult = [
+            'C:\\\Documents\Images',
+            'C:\\\Documents\Images\Images1.jpg',
+            'C:\\\Documents\Images\Images2.jpg',
+            'C:\\\Documents\Images\Images3.jpg'
+        ];
+        $this->fileService->importFiles();// just called this function to seed data for the time-being
+        $result = $this->fileService->search("Image");
+
+        $this->assertEqual(count($expectedResult), count($result));
+        foreach ($expectedResult as $index => $expectedPath) {
+            $this->assertEqual($expectedPath, $result[$index]);
+        }
+    }
+
+    public function test_search_returns_full_paths_of_all_files_when_keyword_is_empty()
+    {
+        $expectedResult = [
+            'C:\\',
+            'C:\\\Documents',
+            'C:\\\Documents\Images',
+            'C:\\\Documents\Images\Images1.jpg',
+            'C:\\\Documents\Images\Images2.jpg',
+            'C:\\\Documents\Images\Images3.jpg',
+            'C:\\\Documents\Works',
+            'C:\\\Documents\Letter.doc',
+            'C:\\\Documents\Accountant',
+            'C:\\\Documents\Accountant\Accounting.xls',
+            'C:\\\Documents\Accountant\AnnualReport.xls',
+            'C:\\\Program Files',
+            'C:\\\Program Files\Skype',
+            'C:\\\Program Files\Skype\Skype.exe',
+            'C:\\\Program Files\Skype\Readme.txt',
+            'C:\\\Program Files\Mysql',
+            'C:\\\Program Files\Mysql\Mysql.exe',
+            'C:\\\Program Files\Mysql\Mysql.com',
+        ];
+        $this->fileService->importFiles();// just called this function to seed data for the time-being
+        $result = $this->fileService->search("");
+
+        $this->assertEqual(count($expectedResult), count($result));
+        foreach ($expectedResult as $index => $expectedPath) {
+            $this->assertEqual($expectedPath, $result[$index]);
+        }
+    }
+
+    public function test_search_func_returns_empty_array_when_keyword_does_not_match_any_of_the_files()
+    {
+        $this->fileService->importFiles();// just called this function to seed data for the time-being
+        $result = $this->fileService->search("Testing");
+
+        $this->assertEqual(0, count($result));
+    }
 }

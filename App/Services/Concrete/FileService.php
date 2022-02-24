@@ -109,11 +109,15 @@ class FileService implements IFileService
         return $lookUp->getFullPath();
     }
 
-    public function search(string $keyword): array
+    public function search(?string $keyword): array
     {
         $result = [];
         // TODO: use parameterised query to prevent SQL injection
-        $rows = $this->databaseService->getDriver()->select("SELECT * FROM files WHERE path LIKE '%".$keyword."%'");
+        $sql = "SELECT * FROM files";
+        if ($keyword) {
+            $sql .= " WHERE path LIKE '%".$keyword."%'";
+        }
+        $rows = $this->databaseService->getDriver()->select($sql);
         if (count($rows) > 0) {
             foreach ($rows as $row) {
                 $file = File::fromDatabaseResult($row);
@@ -124,7 +128,6 @@ class FileService implements IFileService
         return $result;
     }
 
-    // TODO: write test for this function
     public function getAllFiles(): array
     {
         // cache the files to improve the performance
