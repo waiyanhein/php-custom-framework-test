@@ -17,6 +17,10 @@ To run a certain test method, please run the following command.
 - `docker-compose exec php-fpm php test.php {test method name}`
 
 
+### Report
+
+Please open `report.md`.
+
 
 Please let me know if you have any questions.
 
