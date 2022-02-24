@@ -100,49 +100,47 @@ class FileService implements IFileService
 
     // TODO: change this function back to private
     // this is used by search function search function is tested.
-    public function getFullPath(File $file, $resultFiles = [ ]): array
+    public function getFullPath(File $file): string
     {
-        if (count($this->cachedAllFiles) < 1) {
-            $this->cachedAllFiles = $this->databaseService->getDriver()->select("SELECT * FROM files");
-        }
+        $allFiles = $this->getAllFiles();
+        $lookUp = new FullFilePathLookUp($allFiles);
+        $lookUp->lookUp($file);
 
-        if ($file->getParentFileId() < 1 or $file->getParentFileId() == null) {
-            // root file or folder
-            $resultFiles[] = $file;
-
-            return $resultFiles;
-        }
-
-        // file has parent file id
-        $parentFile = null;
-        foreach ($this->cachedAllFiles as $cachedFile) {
-            if ($cachedFile['id'] == $file->getParentFileId()) {
-                $parentFile = $file;
-                break;
-            }
-        }
-
-        $resultFiles[] = $file;
-        $this->getFullPath($parentFile, $resultFiles);
-
-        return $resultFiles;
+        return $lookUp->getFullPath();
     }
 
     public function search(string $keyword): array
     {
-        $files = [];
+        $result = [];
         // TODO: use parameterised query to prevent SQL injection
         $rows = $this->databaseService->getDriver()->select("SELECT * FROM files WHERE path LIKE '%".$keyword."%'");
         if (count($rows) > 0) {
             foreach ($rows as $row) {
                 $file = File::fromDatabaseResult($row);
-                $fullPath = $this->getFullPath($file);
-                //$files[] = new File($row['id'], $row['path'], $row['parent_file_id']);
-                // get the full path of each row
+                $result[] = $this->getFullPath($file);
             }
         }
-        $result = [ ];
 
         return $result;
+    }
+
+    // TODO: write test for this function
+    public function getAllFiles(): array
+    {
+        // cache the files to improve the performance
+        if (count($this->cachedAllFiles) > 0) {
+            return $this->cachedAllFiles;
+        }
+
+        $files = [ ];
+        $rows = $this->databaseService->getDriver()->select("SELECT * FROM files");
+        if (count($rows) > 0) {
+            foreach ($rows as $row) {
+                $files[] = File::fromDatabaseResult($row);
+            }
+        }
+        $this->cachedAllFiles = $files;
+
+        return $files;
     }
 }
