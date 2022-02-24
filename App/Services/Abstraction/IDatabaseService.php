@@ -10,4 +10,10 @@ interface IDatabaseService
     public function executeWriteQuery($sql, $parameters = [ ]);
 
     public function migrate();
+
+    public function beginTransaction();
+
+    public function commitTransaction();
+
+    public function rollbackTransaction();
 }

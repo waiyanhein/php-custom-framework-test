@@ -49,4 +49,19 @@ class MySqlDriver implements IDatabaseDriver
 
         return $statement->fetchAll();
     }
+
+    public function beginTransaction()
+    {
+        $this->pdo->beginTransaction();
+    }
+
+    public function commitTransaction()
+    {
+        $this->pdo->commit();
+    }
+
+    public function rollbackTransaction()
+    {
+        $this->pdo->rollback();
+    }
 }

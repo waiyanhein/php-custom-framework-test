@@ -30,9 +30,20 @@ class FileService implements IFileService
         $this->databaseService->getDriver()->executeWriteQuery($sql, $parameters);
     }
 
+    private function validateImportFileContent($lines): bool
+    {
+        // For now it is only checking if the file is empty
+        // TODO: add more rules
+        if (count($lines) < 1) {
+            $this->logService->logError(new Exception('File is empty.'));
+            return false;
+        }
+
+        return true;
+    }
+
     private function readImportFileLines(): array
     {
-        //TODO: validate the format of the import file's content
         try {
             $lines = [ ];
 
@@ -46,6 +57,11 @@ class FileService implements IFileService
                 fclose($file);
             }
 
+            if (! $this->validateImportFileContent($lines)) {
+                // TODO: write unit tests for this validation logic
+                return [ ];
+            }
+
             return $lines;
         } catch (Exception $e) {
             $this->logService->logError($e);
@@ -54,12 +70,10 @@ class FileService implements IFileService
         }
     }
 
-    // TODO: finish up the function
     public function importFiles(): void
     {
-        // TODO: use transaction
-        // TODO: delete the existing data
         try {
+            $this->databaseService->beginTransaction();
             $this->databaseService->getDriver()->execute('DELETE FROM files');
             $files = [ ];
             $lines = $this->readImportFileLines();
@@ -93,13 +107,13 @@ class FileService implements IFileService
             if (count($files) > 0) {
                 $this->saveImportedFiles($files);
             }
+            $this->databaseService->commitTransaction();
         } catch (Exception $exception) {
+            $this->databaseService->rollbackTransaction();
             $this->logService->logError($exception);
         }
     }
 
-    // TODO: change this function back to private
-    // this is used by search function search function is tested.
     public function getFullPath(File $file): string
     {
         $allFiles = $this->getAllFiles();

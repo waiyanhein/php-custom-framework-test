@@ -43,6 +43,21 @@ class DatabaseService implements IDatabaseService
         $this->getDriver()->select($sql, $parameters);
     }
 
+    public function beginTransaction()
+    {
+        $this->getDriver()->beginTransaction();
+    }
+
+    public function commitTransaction()
+    {
+        $this->getDriver()->commitTransaction();
+    }
+
+    public function rollbackTransaction()
+    {
+        $this->getDriver()->rollbackTransaction();
+    }
+
     public function migrate()
     {
         $createFilesTableQuery = 'CREATE TABLE IF NOT EXISTS files( 

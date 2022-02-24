@@ -110,6 +110,7 @@ class FileServiceTest extends BaseTest
         $this->fileService->importFiles();
 
         $rows = $this->databaseService->getDriver()->select("SELECT * FROM files");
+
         $this->assertEqual(count($expectedData), count($rows));
         foreach ($expectedData as $index => $expectedRow) {
             $this->assertEqual($expectedRow['id'], $rows[$index]['id']);
