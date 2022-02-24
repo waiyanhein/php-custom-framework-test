@@ -128,10 +128,12 @@ class FileService implements IFileService
         $result = [];
         // TODO: use parameterised query to prevent SQL injection
         $sql = "SELECT * FROM files";
-        if ($keyword) {
-            $sql .= " WHERE path LIKE '%".$keyword."%'";
+        $parameters = [];
+        if (! empty($keyword)) {
+            $sql .= " WHERE path LIKE ?";
+            $parameters[] = "%$keyword%";
         }
-        $rows = $this->databaseService->getDriver()->select($sql);
+        $rows = $this->databaseService->getDriver()->select($sql, $parameters);
         if (count($rows) > 0) {
             foreach ($rows as $row) {
                 $file = File::fromDatabaseResult($row);
