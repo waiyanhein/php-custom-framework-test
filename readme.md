@@ -16,6 +16,13 @@ To run a certain test method, please run the following command.
 
 - `docker-compose exec php-fpm php test.php {test method name}`
 
+### Importing the file
+
+Please run the following command to import the files into the database.
+
+- `docker-compose exec php-fpm php import.php`
+
+The files are stored in `import_file_structure` file in the project's root folder.
 
 ### Report
 
