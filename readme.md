@@ -4,6 +4,10 @@ The project is using Docker and I was using Mac OS while I was working the proje
 
 - `docker-compose up -d`
 
+Then, please run the following command for database migration
+
+- `docker-compose exec php-fpm php migrate.php`
+
 After you run the command, you can access project in the browser on `localhost` on port 80.
 
 ### Running the unit tests
